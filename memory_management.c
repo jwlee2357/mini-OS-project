@@ -142,6 +142,7 @@ void dyna_free(int free_id) {
             // found = 1;
         }
     }
+    printf("\n");
     // if(found) {
     //     fprintf(stderr, "Freed allocated partition\n");
     //     print_memory_blocks();

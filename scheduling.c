@@ -84,6 +84,8 @@ void round_robin(Process *processes, int num_processes, int quantum, char (*gant
             }
         }
     }
+    print_memory_blocks();
+    
     //print the statistics for scheduling
     int total_turnaround_time = 0;
     int total_waiting_time = 0;
@@ -179,6 +181,8 @@ void fcfs(Process *processes, int num_processes, char (*gantt_chart)[100], int *
             }
         }
     }
+    print_memory_blocks();
+    
     float avg_waiting_time = (float)total_waiting_time / num_processes;
     float avg_turnaround_time = (float)total_turnaround_time / num_processes;
     printf("\n");
@@ -252,6 +256,7 @@ void sjf(Process *processes, int num_processes, char (*gantt_chart)[100], int *c
         strcpy(gantt_chart[*count], " completed\n");
         (*count)++;
     }
+    print_memory_blocks();
     
     // Calculate completion time
     int current_time_for_calc = 0;
@@ -288,6 +293,8 @@ void srtf(Process *processes, int num_processes, char (*gantt_chart)[100], int *
     char buffer[100];
     int total_waiting_time = 0;
     int total_turnaround_time = 0;
+    int temp = -1;
+    int index;
 
     while (completed_processes < num_processes) {
         int shortest_index = -1;
@@ -312,22 +319,18 @@ void srtf(Process *processes, int num_processes, char (*gantt_chart)[100], int *
                 continue;
             }
         }
+        temp++;
+        if (temp == 0)
+           index = shortest_index;
         print_memory_blocks();
         
-        for (int t = 0; t < current_time; ++t) {
-            strcpy(gantt_chart[*count], "  ");
-            (*count)++;
-        }
         
-        current_time++;
-        processes[shortest_index].remaining_time--;
+        
+        
 
-        for (int j = 0; j < 1; ++j) {
-            strcpy(gantt_chart[*count], "||");
-            (*count)++;
-        }
+        
 
-        strcpy(gantt_chart[*count], "(");
+        /*strcpy(gantt_chart[*count], "(");
         (*count)++;
 
         sprintf(buffer, "%d", current_time + 1);
@@ -342,29 +345,117 @@ void srtf(Process *processes, int num_processes, char (*gantt_chart)[100], int *
 
         sprintf(buffer, "%d", processes[shortest_index].pid);
         strcpy(gantt_chart[*count], buffer);
-        (*count)++;
+        (*count)++;*/
 
-        if (processes[shortest_index].remaining_time == 0) {
-            processes[shortest_index].completion_time = current_time;
-            completed_processes++;
-            dyna_free(processes[shortest_index].mem_block_id);
-            strcpy(gantt_chart[*count], " completed\n");
+        if (processes[index].remaining_time == 0) {
+            processes[index].completion_time = current_time;
+            dyna_free(processes[index].mem_block_id);
+            
+            strcpy(gantt_chart[*count], "(");
             (*count)++;
-            //statistics calculation
-            int waiting_time = current_time - processes[shortest_index].arrival_time - processes[shortest_index].burst_time;
-            total_waiting_time += waiting_time;
-            int turnaround_time = current_time - processes[shortest_index].arrival_time;
-            total_turnaround_time += turnaround_time;
-        } else {
-            strcpy(gantt_chart[*count], " /");
-            (*count)++;
-            sprintf(buffer, "%d", processes[shortest_index].remaining_time);
+
+            sprintf(buffer, "%d", current_time);
             strcpy(gantt_chart[*count], buffer);
             (*count)++;
-            strcpy(gantt_chart[*count], "s remaining\n");
+
+            strcpy(gantt_chart[*count], "s)");
+            (*count)++;
+
+            strcpy(gantt_chart[*count], " P");
+            (*count)++;
+
+            sprintf(buffer, "%d", processes[index].pid);
+            strcpy(gantt_chart[*count], buffer);
+            (*count)++;
+            
+            strcpy(gantt_chart[*count], " completed\n");
+            (*count)++;
+            for (int t = 0; t < current_time; ++t) {
+            	strcpy(gantt_chart[*count], "  ");
+            	(*count)++;
+            }
+            //statistics calculation
+            int waiting_time = current_time - processes[index].arrival_time - processes[index].burst_time;
+            total_waiting_time += waiting_time;
+            int turnaround_time = current_time - processes[index].arrival_time;
+            total_turnaround_time += turnaround_time;
+        } else {
+            if (index != shortest_index) {
+            	strcpy(gantt_chart[*count], "(");
+                (*count)++;
+
+                sprintf(buffer, "%d", current_time);
+                strcpy(gantt_chart[*count], buffer);
+                (*count)++;
+
+                strcpy(gantt_chart[*count], "s)");
+                (*count)++;
+
+                strcpy(gantt_chart[*count], " P");
+                (*count)++;
+
+                sprintf(buffer, "%d", processes[index].pid);
+                strcpy(gantt_chart[*count], buffer);
+                (*count)++;
+                
+            	strcpy(gantt_chart[*count], " /");
+            	(*count)++;
+            	sprintf(buffer, "%d", processes[index].remaining_time);
+            	strcpy(gantt_chart[*count], buffer);
+            	(*count)++;
+            	strcpy(gantt_chart[*count], "s remaining\n");
+            	(*count)++;
+            	for (int t = 0; t < current_time; ++t) {
+            	    strcpy(gantt_chart[*count], "  ");
+                    (*count)++;
+                }
+            }
+        }
+        current_time++;
+        processes[shortest_index].remaining_time--;
+        for (int j = 0; j < 1; ++j) {
+            strcpy(gantt_chart[*count], "||");
             (*count)++;
         }
+        if (processes[shortest_index].remaining_time == 0)
+           completed_processes++;
+        
+        index = shortest_index;
     }
+    processes[index].completion_time = current_time;
+    completed_processes++;
+    dyna_free(processes[index].mem_block_id);
+    print_memory_blocks();
+            
+    strcpy(gantt_chart[*count], "(");
+    (*count)++;
+
+    sprintf(buffer, "%d", current_time);
+    strcpy(gantt_chart[*count], buffer);
+    (*count)++;
+
+    strcpy(gantt_chart[*count], "s)");
+    (*count)++;
+
+    strcpy(gantt_chart[*count], " P");
+    (*count)++;
+
+    sprintf(buffer, "%d", processes[index].pid);
+    strcpy(gantt_chart[*count], buffer);
+    (*count)++;
+            
+    strcpy(gantt_chart[*count], " completed\n");
+    (*count)++;
+    for (int t = 0; t < current_time; ++t) {
+        strcpy(gantt_chart[*count], "  ");
+        (*count)++;
+    }
+    //statistics calculation
+    int waiting_time = current_time - processes[index].arrival_time - processes[index].burst_time;
+    total_waiting_time += waiting_time;
+    int turnaround_time = current_time - processes[index].arrival_time;
+    total_turnaround_time += turnaround_time;
+            
     float avg_waiting_time = (float)total_waiting_time / num_processes;
     float avg_turnaround_time = (float)total_turnaround_time / num_processes;
     printf("\n");
@@ -439,6 +530,8 @@ void priority_scheduling(Process *processes, int num_processes, char (*gantt_cha
         strcpy(gantt_chart[*count], " completed\n");
         (*count)++;
     }
+    print_memory_blocks();
+    printf("\n");
 }
 
 int schedule() {
@@ -451,7 +544,7 @@ int schedule() {
     scanf("%d", &num_processes);
 
     Process *processes = (Process *)malloc(num_processes * sizeof(Process));
-    char gantt_chart[1000][100];
+    char gantt_chart[10000][100];
     int count = 0;
 
     printf("Enter process details:\n");
