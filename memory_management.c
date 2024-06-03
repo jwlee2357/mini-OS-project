@@ -130,8 +130,6 @@ int dyna_alloc(size_t size,  Process process) {
 
 //id받아서 할당
 void dyna_free(int free_id) {
-    // int found = 0;
-
     for(int i = 0; i < MAX_MEM_BLOCKS; i++) {
         if(memory_blocks[i].in_use_flag && memory_blocks[i].block_id == free_id) {
             free(memory_blocks[i].addr);
@@ -139,17 +137,9 @@ void dyna_free(int free_id) {
             memory_blocks[i].block_id = 0;
             memory_blocks[i].in_use_flag = 0;
             memory_blocks[i].size = 0;
-            // found = 1;
         }
     }
     printf("\n");
-    // if(found) {
-    //     fprintf(stderr, "Freed allocated partition\n");
-    //     print_memory_blocks();
-    // }
-    // else {
-    //     fprintf(stderr, "Attempted to free a non-allocated partition\n");
-    // }
 }
 
 void update_free_spaces() {

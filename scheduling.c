@@ -323,29 +323,6 @@ void srtf(Process *processes, int num_processes, char (*gantt_chart)[100], int *
         if (temp == 0)
            index = shortest_index;
         print_memory_blocks();
-        
-        
-        
-        
-
-        
-
-        /*strcpy(gantt_chart[*count], "(");
-        (*count)++;
-
-        sprintf(buffer, "%d", current_time + 1);
-        strcpy(gantt_chart[*count], buffer);
-        (*count)++;
-
-        strcpy(gantt_chart[*count], "s)");
-        (*count)++;
-
-        strcpy(gantt_chart[*count], " P");
-        (*count)++;
-
-        sprintf(buffer, "%d", processes[shortest_index].pid);
-        strcpy(gantt_chart[*count], buffer);
-        (*count)++;*/
 
         if (processes[index].remaining_time == 0) {
             processes[index].completion_time = current_time;
